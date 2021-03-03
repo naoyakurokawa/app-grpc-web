@@ -2,6 +2,7 @@ syntax = "proto3";
 
 service HelloService {
     rpc SayHello (HelloRequest) returns (HelloResponse);
+    rpc GetUsers (GetUsersRequest) returns (GetUsersResponse);
 }
 
 message HelloRequest {
@@ -10,5 +11,21 @@ message HelloRequest {
 
 message HelloResponse {
     string message = 1;
+}
+
+message User {
+  int32 id    = 1;
+  string name = 2;
+  int32 score = 3;
+}
+
+message GetUsersRequest {
+    int32 id = 1;
+    string name = 2;
+    int32 score = 3;
+}
+
+message GetUsersResponse {
+    repeated User users = 1;
 }
 

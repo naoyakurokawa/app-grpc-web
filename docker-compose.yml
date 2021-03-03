@@ -1,7 +1,23 @@
-version: "3"
+version: '3'
 services:
+  db:
+    image: mysql:8.0
+    volumes:
+      - db-store:/var/lib/mysql
+      - ./logs:/var/log/mysql
+      - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    environment:
+      - MYSQL_DATABASE=test
+      - MYSQL_USER=test
+      - MYSQL_PASSWORD=test
+      - MYSQL_ROOT_PASSWORD=test
+      - TZ=Asia/Tokyo
+    ports:
+      - 13306:3306
   envoy:
     build:
-      context:  ./proxy
+      context: ./proxy
     ports:
-      - "8080:8080"
+      - '8080:8080'
+volumes:
+  db-store:

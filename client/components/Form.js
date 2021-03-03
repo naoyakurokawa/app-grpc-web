@@ -13,20 +13,26 @@ export const Form = ( {onAddData} ) => {
     onAddData(response.getMessage());
   }
   return (
-  <div>
-    <h4>grpc-test-form</h4>
-    <form onSubmit={submitForm}>
-      <div>
-        <input
-          type ="text"
-          value={text}
-          onChange={(e)=>setText(e.target.value)}
-        />
-      </div>
-      <div>
-        <button>送信</button>
-      </div>
-    </form>
-  </div>
+    <div className="form-container">
+      <h4>grpc-test-form</h4>
+      <form onSubmit={submitForm}>
+        <div>
+          <input
+            type ="text"
+            value={text}
+            onChange={(e)=>setText(e.target.value)}
+          />
+        </div>
+        <div>
+          <button>送信</button>
+        </div>
+      </form>
+      <style jsx>{`
+      .form-container {
+        margin:10px;
+      }
+      `}
+      </style>
+    </div>
   )
 }

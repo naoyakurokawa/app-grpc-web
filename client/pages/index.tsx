@@ -2,23 +2,37 @@ import Head from 'next/head'
 import { useEffect,useState } from 'react'
 import { Form } from "../components/Form"
 import { List } from "../components/List"
+import { UserList } from "../components/UserList"
 import { getFormData } from '../components/const/form_data';
+import {GetUsersRequest} from '../lib/hello_pb';
+import {HelloServiceClient} from '../lib/HelloServiceClientPb';
 
 
 export default function Home() {
   const [formData, setFormData] = useState([]);
+  const [dbData, setDbData] = useState({});
+  //フォームの入力データを取得、表示
   const fetchFormData = async ()=>{
     const Data = await getFormData();
     setFormData(Data);
   }
   const addData = (data) => {
-    console.log(data);
     // ...はスプレット構文 :「[ ] や { }を外してくれるやつ」
     setFormData([...formData, data]);
   }
+  //データベースのデータを取得、表示
+  const fetchDbData = async ()=>{
+      const request = new GetUsersRequest();
+      const client = new HelloServiceClient("http://localhost:8080");
+      const response = await client.getUsers(request, {});
+      const userList = response.toObject();
+      setDbData(userList["usersList"]);
+  }
   useEffect(()=>{
     fetchFormData();
+    fetchDbData();
   },[])
+
   return (
     <div className="container">
       <Head>
@@ -32,8 +46,14 @@ export default function Home() {
         </h1>
 
         {/* <Form onAddLang={addLang}/> */}
-        <Form onAddData={addData}/>
-        <List formData={formData}/>
+        <div className="fetch-form-sec">
+          <Form onAddData={addData}/>
+          <List formData={formData}/>
+        </div>
+        <div className="fetch-db-sec">
+          <h3>grpc-test-fetch-userTable</h3>
+          <UserList userList={dbData}/>
+        </div>
         <div className="grid">
           <a href="" className="card">
             <h3>test1</h3>
@@ -186,6 +206,19 @@ export default function Home() {
             width: 100%;
             flex-direction: column;
           }
+        }
+
+        .fetch-form-sec{
+          border: 2px solid;
+          border-color: #031de2;
+          padding: 30px;
+        }
+
+        .fetch-db-sec{
+          border: 2px solid;
+          border-color: #031de2;
+          padding: 20px;
+          margin-top: 10px;
         }
       `}</style>
 
