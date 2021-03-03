@@ -75,5 +75,45 @@ export class HelloServiceClient {
     this.methodInfoSayHello);
   }
 
+  methodInfoGetUsers = new grpcWeb.AbstractClientBase.MethodInfo(
+    hello_pb.GetUsersResponse,
+    (request: hello_pb.GetUsersRequest) => {
+      return request.serializeBinary();
+    },
+    hello_pb.GetUsersResponse.deserializeBinary
+  );
+
+  getUsers(
+    request: hello_pb.GetUsersRequest,
+    metadata: grpcWeb.Metadata | null): Promise<hello_pb.GetUsersResponse>;
+
+  getUsers(
+    request: hello_pb.GetUsersRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: hello_pb.GetUsersResponse) => void): grpcWeb.ClientReadableStream<hello_pb.GetUsersResponse>;
+
+  getUsers(
+    request: hello_pb.GetUsersRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.Error,
+               response: hello_pb.GetUsersResponse) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/HelloService/GetUsers',
+        request,
+        metadata || {},
+        this.methodInfoGetUsers,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/HelloService/GetUsers',
+    request,
+    metadata || {},
+    this.methodInfoGetUsers);
+  }
+
 }
 

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 CLIENT_OUTDIR=client/lib
-# SERVER_OUTPUT_DIR=server/helloworld
+SERVER_OUTPUT_DIR=server/hello
 
 mkdir -p ${CLIENT_OUTDIR} ${SERVER_OUTPUT_DIR}
 
@@ -13,4 +13,4 @@ mkdir -p ${CLIENT_OUTDIR} ${SERVER_OUTPUT_DIR}
 protoc --proto_path=proto hello.proto \
     --js_out=import_style=commonjs:${CLIENT_OUTDIR} \
     --grpc-web_out=import_style=typescript,mode=grpcwebtext:${CLIENT_OUTDIR} \
-    # --go_out=plugins=grpc:${SERVER_OUTPUT_DIR}
+    --go_out=plugins=grpc:${SERVER_OUTPUT_DIR}

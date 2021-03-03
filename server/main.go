@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
-	"log"
-	"net"
-
-	pb "github.com/Le0tk0k/server/hello"
+	_ "github.com/go-sql-driver/mysql"
+	// "github.com/jmoiron/sqlx"
+	pb "github.com/naoyakurokawa/app-grpc-web/hello"
+	"github.com/naoyakurokawa/app-grpc-web/models"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"log"
+	"net"
 )
 
 const (
@@ -19,6 +21,12 @@ type server struct{}
 func (s *server) SayHello(ctx context.Context, r *pb.HelloRequest) (*pb.HelloResponse, error) {
 	log.Printf("Recieved : %s", r.GetName())
 	return &pb.HelloResponse{Message: "Hello " + r.GetName() + "!"}, nil
+}
+
+// GET Users
+func (s *server) GetUsers(ctx context.Context, r *pb.GetUsersRequest) (*pb.GetUsersResponse, error) {
+	var users, err = models.GetUsers(*r)
+	return &pb.GetUsersResponse{Users: users}, err
 }
 
 func main() {
