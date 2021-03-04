@@ -7,27 +7,17 @@ import (
 	"log"
 )
 
-var db *sqlx.DB
-
-type User struct {
-	ID    int
-	Name  string
-	Score int
-}
-
-type Userlist []User
-
 func GetUsers(request pb.GetUsersRequest) ([]*pb.User, error) {
 	// var users []User
 	var userlist []*pb.User
 	db, err := sqlx.Open("mysql", "root:test@tcp(127.0.0.1:13306)/test")
 	if err != nil {
-		log.Println(err)
+		log.Fatalln(err)
 	}
 	q := "SELECT * FROM users"
 	err = db.Select(&userlist, q)
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
 	return userlist, nil
 }
