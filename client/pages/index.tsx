@@ -2,6 +2,7 @@ import Head from 'next/head'
 import { useEffect,useState } from 'react'
 import { Form } from "../components/Form"
 import { List } from "../components/List"
+import { UserRegisterForm } from "../components/UserRegisterForm"
 import { UserList } from "../components/UserList"
 import { getFormData } from '../components/const/form_data';
 import {GetUsersRequest} from '../lib/hello_pb';
@@ -53,6 +54,10 @@ export default function Home() {
         <div className="fetch-db-sec">
           <h3>grpc-test-fetch-userTable</h3>
           <UserList userList={dbData}/>
+        </div>
+        <div className="register-user-sec">
+          <h3>register-user</h3>
+          <UserRegisterForm/>
         </div>
         <div className="grid">
           <a href="" className="card">
@@ -215,6 +220,13 @@ export default function Home() {
         }
 
         .fetch-db-sec{
+          border: 2px solid;
+          border-color: #031de2;
+          padding: 20px;
+          margin-top: 10px;
+        }
+
+        .register-user-sec{
           border: 2px solid;
           border-color: #031de2;
           padding: 20px;

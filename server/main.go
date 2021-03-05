@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	_ "github.com/go-sql-driver/mysql"
-	// "github.com/jmoiron/sqlx"
 	pb "github.com/naoyakurokawa/app-grpc-web/hello"
 	"github.com/naoyakurokawa/app-grpc-web/models"
 	"google.golang.org/grpc"
@@ -29,12 +27,21 @@ func (s *server) GetUsers(ctx context.Context, r *pb.GetUsersRequest) (*pb.GetUs
 	return &pb.GetUsersResponse{Users: users}, err
 }
 
+// CreateUser
+func (s *server) CreateUser(ctx context.Context, r *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
+	var _, err = models.CreateUser(*r)
+	if err == nil {
+		return &pb.CreateUserResponse{}, nil
+	} else {
+		return &pb.CreateUserResponse{}, err
+	}
+}
+
 func main() {
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-
 	s := grpc.NewServer()
 	pb.RegisterHelloServiceServer(s, &server{})
 	reflection.Register(s)
