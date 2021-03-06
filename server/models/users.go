@@ -7,8 +7,9 @@ import (
 	"log"
 )
 
-func GetUsers(request pb.GetUsersRequest) ([]*pb.User, error) {
+func GetUsers(db, request pb.GetUsersRequest) ([]*pb.User, error) {
 	var userlist []*pb.User
+	var err error
 	q := "SELECT * FROM users"
 	err = db.Select(&userlist, q)
 	if err != nil {
@@ -17,7 +18,8 @@ func GetUsers(request pb.GetUsersRequest) ([]*pb.User, error) {
 	return userlist, nil
 }
 
-func CreateUser(request pb.CreateUserRequest) (string, error) {
+func CreateUser(db, request pb.CreateUserRequest) (string, error) {
+	var err error
 	log.Printf("request : %s", request)
 	user := pb.User{
 		Name:     request.GetName(),
