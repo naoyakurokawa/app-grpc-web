@@ -1,25 +1,23 @@
 package models
 
 import (
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 	pb "github.com/naoyakurokawa/app-grpc-web/hello"
-	// "google.golang.org/grpc/codes"
-	// "google.golang.org/grpc/status"
 	"log"
 )
 
-func GetUsers(db, request pb.GetUsersRequest) ([]*pb.User, error) {
+func GetUsers(db *sqlx.DB, request pb.GetUsersRequest) ([]*pb.User, error) {
 	var userlist []*pb.User
-	var err error
 	q := "SELECT * FROM users"
-	err = db.Select(&userlist, q)
+	err := db.Select(&userlist, q)
 	if err != nil {
 		log.Println(err)
 	}
 	return userlist, nil
 }
 
-func CreateUser(db, request pb.CreateUserRequest) (string, error) {
-	var err error
+func CreateUser(db *sqlx.DB, request pb.CreateUserRequest) (string, error) {
 	log.Printf("request : %s", request)
 	user := pb.User{
 		Name:     request.GetName(),

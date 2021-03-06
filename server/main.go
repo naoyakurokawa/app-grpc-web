@@ -41,7 +41,9 @@ func (s *server) CreateUser(ctx context.Context, r *pb.CreateUserRequest) (*pb.C
 }
 
 func main() {
-	_, err = &server{db: sqlx.Open("mysql", "root:test@tcp(127.0.0.1:13306)/test")}
+	se := &server{}
+	var err error
+	se.db, err = sqlx.Open("mysql", "root:test@tcp(127.0.0.1:13306)/test")
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -51,7 +53,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	pb.RegisterHelloServiceServer(s, &server{})
+	pb.RegisterHelloServiceServer(s, se)
 	reflection.Register(s)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %c", err)
