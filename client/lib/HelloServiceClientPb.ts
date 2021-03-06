@@ -115,5 +115,45 @@ export class HelloServiceClient {
     this.methodInfoGetUsers);
   }
 
+  methodInfoCreateUser = new grpcWeb.AbstractClientBase.MethodInfo(
+    hello_pb.CreateUserResponse,
+    (request: hello_pb.CreateUserRequest) => {
+      return request.serializeBinary();
+    },
+    hello_pb.CreateUserResponse.deserializeBinary
+  );
+
+  createUser(
+    request: hello_pb.CreateUserRequest,
+    metadata: grpcWeb.Metadata | null): Promise<hello_pb.CreateUserResponse>;
+
+  createUser(
+    request: hello_pb.CreateUserRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: hello_pb.CreateUserResponse) => void): grpcWeb.ClientReadableStream<hello_pb.CreateUserResponse>;
+
+  createUser(
+    request: hello_pb.CreateUserRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.Error,
+               response: hello_pb.CreateUserResponse) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/HelloService/CreateUser',
+        request,
+        metadata || {},
+        this.methodInfoCreateUser,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/HelloService/CreateUser',
+    request,
+    metadata || {},
+    this.methodInfoCreateUser);
+  }
+
 }
 

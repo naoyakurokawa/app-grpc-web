@@ -48,6 +48,9 @@ export class User extends jspb.Message {
   getScore(): number;
   setScore(value: number): User;
 
+  getPhotourl(): string;
+  setPhotourl(value: string): User;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): User.AsObject;
   static toObject(includeInstance: boolean, msg: User): User.AsObject;
@@ -61,6 +64,7 @@ export namespace User {
     id: number,
     name: string,
     score: number,
+    photourl: string,
   }
 }
 
@@ -73,6 +77,9 @@ export class GetUsersRequest extends jspb.Message {
 
   getScore(): number;
   setScore(value: number): GetUsersRequest;
+
+  getPhotourl(): string;
+  setPhotourl(value: string): GetUsersRequest;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): GetUsersRequest.AsObject;
@@ -87,6 +94,7 @@ export namespace GetUsersRequest {
     id: number,
     name: string,
     score: number,
+    photourl: string,
   }
 }
 
@@ -107,6 +115,54 @@ export class GetUsersResponse extends jspb.Message {
 export namespace GetUsersResponse {
   export type AsObject = {
     usersList: Array<User.AsObject>,
+  }
+}
+
+export class CreateUserRequest extends jspb.Message {
+  getId(): number;
+  setId(value: number): CreateUserRequest;
+
+  getName(): string;
+  setName(value: string): CreateUserRequest;
+
+  getScore(): number;
+  setScore(value: number): CreateUserRequest;
+
+  getPhotourl(): string;
+  setPhotourl(value: string): CreateUserRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): CreateUserRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: CreateUserRequest): CreateUserRequest.AsObject;
+  static serializeBinaryToWriter(message: CreateUserRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): CreateUserRequest;
+  static deserializeBinaryFromReader(message: CreateUserRequest, reader: jspb.BinaryReader): CreateUserRequest;
+}
+
+export namespace CreateUserRequest {
+  export type AsObject = {
+    id: number,
+    name: string,
+    score: number,
+    photourl: string,
+  }
+}
+
+export class CreateUserResponse extends jspb.Message {
+  getTxt(): string;
+  setTxt(value: string): CreateUserResponse;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): CreateUserResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: CreateUserResponse): CreateUserResponse.AsObject;
+  static serializeBinaryToWriter(message: CreateUserResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): CreateUserResponse;
+  static deserializeBinaryFromReader(message: CreateUserResponse, reader: jspb.BinaryReader): CreateUserResponse;
+}
+
+export namespace CreateUserResponse {
+  export type AsObject = {
+    txt: string,
   }
 }
 
