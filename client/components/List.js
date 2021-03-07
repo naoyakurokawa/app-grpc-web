@@ -4,10 +4,10 @@ import { useEffect} from 'react';
 export const List = ({formData}) => {
   useEffect(()=>{
     //mouting,updateで呼ばれる
-    console.log('List.js:useEffect');
+    // console.log('List.js:useEffect');
     //unmountで呼ばれる
     return()=>{
-      console.log('List.js:useEffect:ummount');
+      // console.log('List.js:useEffect:ummount');
     }
   })
   return(

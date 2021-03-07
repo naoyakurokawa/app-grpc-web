@@ -40,6 +40,20 @@ func (s *server) CreateUser(ctx context.Context, r *pb.CreateUserRequest) (*pb.C
 	return &pb.CreateUserResponse{}, nil
 }
 
+// GetUserById
+func (s *server) GetUserById(ctx context.Context, r *pb.GetUserByIdRequest) (*pb.GetUserByIdResponse, error) {
+	var id = r.Id
+	var user, err = models.GetUserById(s.db, id)
+	return &pb.GetUserByIdResponse{User: user}, err
+}
+
+// DeleteUser
+func (s *server) DeleteUser(ctx context.Context, r *pb.DeleteUserRequest) (*pb.DeleteUserResponse, error) {
+	var id = r.Id
+	models.DeleteUser(s.db, id)
+	return &pb.DeleteUserResponse{}, nil
+}
+
 func main() {
 	se := &server{}
 	var err error

@@ -1,6 +1,7 @@
 package models
 
 import (
+	// "fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	pb "github.com/naoyakurokawa/app-grpc-web/hello"
@@ -35,4 +36,23 @@ func CreateUser(db *sqlx.DB, request pb.CreateUserRequest) (string, error) {
 	}
 	tx.Commit()
 	return "登録成功", err
+}
+
+func GetUserById(db *sqlx.DB, id int32) ([]*pb.User, error) {
+	log.Println(id)
+	var user []*pb.User
+	q := `SELECT * FROM users WHERE ID = ?;`
+	err := db.Select(&user, q, id)
+	if err != nil {
+		log.Println(err)
+	}
+	return user, nil
+}
+
+func DeleteUser(db *sqlx.DB, id int32) {
+	q := `DELETE FROM users WHERE ID = ?;`
+	_, err := db.Exec(q, id)
+	if err != nil {
+		log.Println(err)
+	}
 }
