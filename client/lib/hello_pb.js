@@ -1916,7 +1916,7 @@ proto.DeleteUserResponse.prototype.toObject = function(opt_includeInstance) {
  */
 proto.DeleteUserResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0)
+    isdelete: jspb.Message.getBooleanFieldWithDefault(msg, 1, false)
   };
 
   if (includeInstance) {
@@ -1954,8 +1954,8 @@ proto.DeleteUserResponse.deserializeBinaryFromReader = function(msg, reader) {
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt32());
-      msg.setId(value);
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIsdelete(value);
       break;
     default:
       reader.skipField();
@@ -1986,9 +1986,9 @@ proto.DeleteUserResponse.prototype.serializeBinary = function() {
  */
 proto.DeleteUserResponse.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getId();
-  if (f !== 0) {
-    writer.writeInt32(
+  f = message.getIsdelete();
+  if (f) {
+    writer.writeBool(
       1,
       f
     );
@@ -1997,20 +1997,20 @@ proto.DeleteUserResponse.serializeBinaryToWriter = function(message, writer) {
 
 
 /**
- * optional int32 id = 1;
- * @return {number}
+ * optional bool isDelete = 1;
+ * @return {boolean}
  */
-proto.DeleteUserResponse.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+proto.DeleteUserResponse.prototype.getIsdelete = function() {
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 1, false));
 };
 
 
 /**
- * @param {number} value
+ * @param {boolean} value
  * @return {!proto.DeleteUserResponse} returns this
  */
-proto.DeleteUserResponse.prototype.setId = function(value) {
-  return jspb.Message.setProto3IntField(this, 1, value);
+proto.DeleteUserResponse.prototype.setIsdelete = function(value) {
+  return jspb.Message.setProto3BooleanField(this, 1, value);
 };
 
 

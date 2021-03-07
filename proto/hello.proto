@@ -50,7 +50,7 @@ message GetUserByIdRequest {
 }
 
 message GetUserByIdResponse {
-    repeated User user = 1;
+    User user = 1;
 }
 
 message DeleteUserRequest {
@@ -58,5 +58,5 @@ message DeleteUserRequest {
 }
 
 message DeleteUserResponse {
-  int32 id = 1;
+  bool isDelete = 1;
 }

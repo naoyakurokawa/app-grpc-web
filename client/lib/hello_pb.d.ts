@@ -223,8 +223,8 @@ export namespace DeleteUserRequest {
 }
 
 export class DeleteUserResponse extends jspb.Message {
-  getId(): number;
-  setId(value: number): DeleteUserResponse;
+  getIsdelete(): boolean;
+  setIsdelete(value: boolean): DeleteUserResponse;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): DeleteUserResponse.AsObject;
@@ -236,7 +236,7 @@ export class DeleteUserResponse extends jspb.Message {
 
 export namespace DeleteUserResponse {
   export type AsObject = {
-    id: number,
+    isdelete: boolean,
   }
 }
 

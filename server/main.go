@@ -27,13 +27,13 @@ func (s *server) SayHello(ctx context.Context, r *pb.HelloRequest) (*pb.HelloRes
 
 // GET Users
 func (s *server) GetUsers(ctx context.Context, r *pb.GetUsersRequest) (*pb.GetUsersResponse, error) {
-	var users, err = models.GetUsers(s.db, *r)
+	var users, err = models.GetUsers(ctx, s.db, *r)
 	return &pb.GetUsersResponse{Users: users}, err
 }
 
 // CreateUser
 func (s *server) CreateUser(ctx context.Context, r *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
-	var _, err = models.CreateUser(s.db, *r)
+	var _, err = models.CreateUser(ctx, s.db, *r)
 	if err != nil {
 		return nil, err
 	}
@@ -43,15 +43,19 @@ func (s *server) CreateUser(ctx context.Context, r *pb.CreateUserRequest) (*pb.C
 // GetUserById
 func (s *server) GetUserById(ctx context.Context, r *pb.GetUserByIdRequest) (*pb.GetUserByIdResponse, error) {
 	var id = r.Id
-	var user, err = models.GetUserById(s.db, id)
+	var user, err = models.GetUserById(ctx, s.db, id)
 	return &pb.GetUserByIdResponse{User: user}, err
 }
 
 // DeleteUser
 func (s *server) DeleteUser(ctx context.Context, r *pb.DeleteUserRequest) (*pb.DeleteUserResponse, error) {
 	var id = r.Id
-	models.DeleteUser(s.db, id)
-	return &pb.DeleteUserResponse{}, nil
+	err := models.DeleteUser(ctx, s.db, id)
+	if err != nil {
+		log.Println(err)
+		return &pb.DeleteUserResponse{IsDelete: false}, nil
+	}
+	return &pb.DeleteUserResponse{IsDelete: true}, nil
 }
 
 func main() {

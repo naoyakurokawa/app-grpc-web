@@ -2,23 +2,24 @@ package models
 
 import (
 	// "fmt"
+	"context"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	pb "github.com/naoyakurokawa/app-grpc-web/hello"
 	"log"
 )
 
-func GetUsers(db *sqlx.DB, request pb.GetUsersRequest) ([]*pb.User, error) {
+func GetUsers(ctx context.Context, db *sqlx.DB, request pb.GetUsersRequest) ([]*pb.User, error) {
 	var userlist []*pb.User
 	q := "SELECT * FROM users"
-	err := db.Select(&userlist, q)
+	err := db.SelectContext(ctx, &userlist, q)
 	if err != nil {
 		log.Println(err)
 	}
 	return userlist, nil
 }
 
-func CreateUser(db *sqlx.DB, request pb.CreateUserRequest) (string, error) {
+func CreateUser(ctx context.Context, db *sqlx.DB, request pb.CreateUserRequest) (string, error) {
 	log.Printf("request : %s", request)
 	user := pb.User{
 		Name:     request.GetName(),
@@ -27,7 +28,7 @@ func CreateUser(db *sqlx.DB, request pb.CreateUserRequest) (string, error) {
 	}
 	query := `INSERT INTO users (id, name, score, photourl) VALUES (:id, :name, :score, :photourl);`
 	tx := db.MustBegin()
-	_, err := tx.NamedExec(query, &user)
+	_, err := tx.NamedExecContext(ctx, query, &user)
 	if err != nil {
 		// エラーが発生した場合はロールバックします。
 		tx.Rollback()
@@ -38,21 +39,24 @@ func CreateUser(db *sqlx.DB, request pb.CreateUserRequest) (string, error) {
 	return "登録成功", err
 }
 
-func GetUserById(db *sqlx.DB, id int32) ([]*pb.User, error) {
+func GetUserById(ctx context.Context, db *sqlx.DB, id int32) ([]*pb.User, error) {
 	log.Println(id)
 	var user []*pb.User
 	q := `SELECT * FROM users WHERE ID = ?;`
-	err := db.Select(&user, q, id)
+	err := db.SelectContext(ctx, &user, q, id)
 	if err != nil {
 		log.Println(err)
+		return nil, err
 	}
 	return user, nil
 }
 
-func DeleteUser(db *sqlx.DB, id int32) {
+func DeleteUser(ctx context.Context, db *sqlx.DB, id int32) error {
 	q := `DELETE FROM users WHERE ID = ?;`
-	_, err := db.Exec(q, id)
+	_, err := db.ExecContext(ctx, q, id)
 	if err != nil {
 		log.Println(err)
+		return err
 	}
+	return nil
 }
