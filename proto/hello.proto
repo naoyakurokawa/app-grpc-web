@@ -4,6 +4,8 @@ service HelloService {
     rpc SayHello (HelloRequest) returns (HelloResponse);
     rpc GetUsers (GetUsersRequest) returns (GetUsersResponse);
     rpc CreateUser (CreateUserRequest) returns (CreateUserResponse);
+    rpc GetUserById (GetUserByIdRequest) returns (GetUserByIdResponse);
+    rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse);
 }
 
 message HelloRequest {
@@ -41,4 +43,20 @@ message CreateUserRequest {
 
 message CreateUserResponse {
     string txt = 1;
+}
+
+message GetUserByIdRequest {
+    int32 id = 1;
+}
+
+message GetUserByIdResponse {
+    User user = 1;
+}
+
+message DeleteUserRequest {
+  int32 id = 1;
+}
+
+message DeleteUserResponse {
+  bool isDelete = 1;
 }

@@ -155,5 +155,85 @@ export class HelloServiceClient {
     this.methodInfoCreateUser);
   }
 
+  methodInfoGetUserById = new grpcWeb.AbstractClientBase.MethodInfo(
+    hello_pb.GetUserByIdResponse,
+    (request: hello_pb.GetUserByIdRequest) => {
+      return request.serializeBinary();
+    },
+    hello_pb.GetUserByIdResponse.deserializeBinary
+  );
+
+  getUserById(
+    request: hello_pb.GetUserByIdRequest,
+    metadata: grpcWeb.Metadata | null): Promise<hello_pb.GetUserByIdResponse>;
+
+  getUserById(
+    request: hello_pb.GetUserByIdRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: hello_pb.GetUserByIdResponse) => void): grpcWeb.ClientReadableStream<hello_pb.GetUserByIdResponse>;
+
+  getUserById(
+    request: hello_pb.GetUserByIdRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.Error,
+               response: hello_pb.GetUserByIdResponse) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/HelloService/GetUserById',
+        request,
+        metadata || {},
+        this.methodInfoGetUserById,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/HelloService/GetUserById',
+    request,
+    metadata || {},
+    this.methodInfoGetUserById);
+  }
+
+  methodInfoDeleteUser = new grpcWeb.AbstractClientBase.MethodInfo(
+    hello_pb.DeleteUserResponse,
+    (request: hello_pb.DeleteUserRequest) => {
+      return request.serializeBinary();
+    },
+    hello_pb.DeleteUserResponse.deserializeBinary
+  );
+
+  deleteUser(
+    request: hello_pb.DeleteUserRequest,
+    metadata: grpcWeb.Metadata | null): Promise<hello_pb.DeleteUserResponse>;
+
+  deleteUser(
+    request: hello_pb.DeleteUserRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: hello_pb.DeleteUserResponse) => void): grpcWeb.ClientReadableStream<hello_pb.DeleteUserResponse>;
+
+  deleteUser(
+    request: hello_pb.DeleteUserRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.Error,
+               response: hello_pb.DeleteUserResponse) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/HelloService/DeleteUser',
+        request,
+        metadata || {},
+        this.methodInfoDeleteUser,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/HelloService/DeleteUser',
+    request,
+    metadata || {},
+    this.methodInfoDeleteUser);
+  }
+
 }
 

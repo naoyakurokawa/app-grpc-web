@@ -166,3 +166,77 @@ export namespace CreateUserResponse {
   }
 }
 
+export class GetUserByIdRequest extends jspb.Message {
+  getId(): number;
+  setId(value: number): GetUserByIdRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetUserByIdRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: GetUserByIdRequest): GetUserByIdRequest.AsObject;
+  static serializeBinaryToWriter(message: GetUserByIdRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetUserByIdRequest;
+  static deserializeBinaryFromReader(message: GetUserByIdRequest, reader: jspb.BinaryReader): GetUserByIdRequest;
+}
+
+export namespace GetUserByIdRequest {
+  export type AsObject = {
+    id: number,
+  }
+}
+
+export class GetUserByIdResponse extends jspb.Message {
+  getUserList(): Array<User>;
+  setUserList(value: Array<User>): GetUserByIdResponse;
+  clearUserList(): GetUserByIdResponse;
+  addUser(value?: User, index?: number): User;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetUserByIdResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: GetUserByIdResponse): GetUserByIdResponse.AsObject;
+  static serializeBinaryToWriter(message: GetUserByIdResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetUserByIdResponse;
+  static deserializeBinaryFromReader(message: GetUserByIdResponse, reader: jspb.BinaryReader): GetUserByIdResponse;
+}
+
+export namespace GetUserByIdResponse {
+  export type AsObject = {
+    userList: Array<User.AsObject>,
+  }
+}
+
+export class DeleteUserRequest extends jspb.Message {
+  getId(): number;
+  setId(value: number): DeleteUserRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): DeleteUserRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: DeleteUserRequest): DeleteUserRequest.AsObject;
+  static serializeBinaryToWriter(message: DeleteUserRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): DeleteUserRequest;
+  static deserializeBinaryFromReader(message: DeleteUserRequest, reader: jspb.BinaryReader): DeleteUserRequest;
+}
+
+export namespace DeleteUserRequest {
+  export type AsObject = {
+    id: number,
+  }
+}
+
+export class DeleteUserResponse extends jspb.Message {
+  getIsdelete(): boolean;
+  setIsdelete(value: boolean): DeleteUserResponse;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): DeleteUserResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: DeleteUserResponse): DeleteUserResponse.AsObject;
+  static serializeBinaryToWriter(message: DeleteUserResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): DeleteUserResponse;
+  static deserializeBinaryFromReader(message: DeleteUserResponse, reader: jspb.BinaryReader): DeleteUserResponse;
+}
+
+export namespace DeleteUserResponse {
+  export type AsObject = {
+    isdelete: boolean,
+  }
+}
+
