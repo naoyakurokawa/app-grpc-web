@@ -6,6 +6,7 @@ service HelloService {
     rpc CreateUser (CreateUserRequest) returns (CreateUserResponse);
     rpc GetUserById (GetUserByIdRequest) returns (GetUserByIdResponse);
     rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse);
+    rpc Login (LoginRequest) returns (LoginResponse);
 }
 
 message HelloRequest {
@@ -21,6 +22,7 @@ message User {
   string name = 2;
   int32 score = 3;
   string photourl =4;
+  string password = 5;
 }
 
 message GetUsersRequest {
@@ -28,6 +30,7 @@ message GetUsersRequest {
     string name = 2;
     int32 score = 3;
     string photourl =4;
+    string password = 5;
 }
 
 message GetUsersResponse {
@@ -39,6 +42,7 @@ message CreateUserRequest {
     string name = 2;
     int32 score = 3;
     string photourl =4;
+    string password = 5;
 }
 
 message CreateUserResponse {
@@ -50,7 +54,7 @@ message GetUserByIdRequest {
 }
 
 message GetUserByIdResponse {
-    User user = 1;
+    repeated User user = 1;
 }
 
 message DeleteUserRequest {
@@ -59,4 +63,15 @@ message DeleteUserRequest {
 
 message DeleteUserResponse {
   bool isDelete = 1;
+}
+
+message LoginRequest {
+  string name= 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  int32 id = 1;
+  string token = 2;
+  bool isLogin = 3;
 }

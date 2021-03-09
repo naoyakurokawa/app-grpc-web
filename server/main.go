@@ -58,6 +58,16 @@ func (s *server) DeleteUser(ctx context.Context, r *pb.DeleteUserRequest) (*pb.D
 	return &pb.DeleteUserResponse{IsDelete: true}, nil
 }
 
+// Login
+func (s *server) Login(ctx context.Context, r *pb.LoginRequest) (*pb.LoginResponse, error) {
+	user_id, err := models.LoginUser(ctx, s.db, *r)
+	if err != nil {
+		log.Printf("error : %s", err)
+		return nil, err
+	}
+	return &pb.LoginResponse{Id: user_id, Token: "testToken", IsLogin: true}, nil
+}
+
 func main() {
 	se := &server{}
 	var err error
