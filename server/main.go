@@ -7,6 +7,7 @@ import (
 	pb "github.com/naoyakurokawa/app-grpc-web/hello"
 	"github.com/naoyakurokawa/app-grpc-web/models"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
@@ -60,12 +61,13 @@ func (s *server) DeleteUser(ctx context.Context, r *pb.DeleteUserRequest) (*pb.D
 
 // Login
 func (s *server) Login(ctx context.Context, r *pb.LoginRequest) (*pb.LoginResponse, error) {
-	user_id, err := models.LoginUser(ctx, s.db, *r)
+	user_id, uuid, err := models.LoginUser(ctx, s.db, *r)
 	if err != nil {
 		log.Printf("error : %s", err)
 		return nil, err
 	}
-	return &pb.LoginResponse{Id: user_id, Token: "testToken", IsLogin: true}, nil
+	grpc.SetHeader(ctx, metadata.Pairs("login_token", uuid))
+	return &pb.LoginResponse{Id: user_id, Token: uuid, IsLogin: true}, nil
 }
 
 func main() {

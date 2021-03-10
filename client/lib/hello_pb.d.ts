@@ -72,6 +72,36 @@ export namespace User {
   }
 }
 
+export class Session extends jspb.Message {
+  getId(): number;
+  setId(value: number): Session;
+
+  getUuid(): string;
+  setUuid(value: string): Session;
+
+  getName(): string;
+  setName(value: string): Session;
+
+  getUserid(): number;
+  setUserid(value: number): Session;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): Session.AsObject;
+  static toObject(includeInstance: boolean, msg: Session): Session.AsObject;
+  static serializeBinaryToWriter(message: Session, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Session;
+  static deserializeBinaryFromReader(message: Session, reader: jspb.BinaryReader): Session;
+}
+
+export namespace Session {
+  export type AsObject = {
+    id: number,
+    uuid: string,
+    name: string,
+    userid: number,
+  }
+}
+
 export class GetUsersRequest extends jspb.Message {
   getId(): number;
   setId(value: number): GetUsersRequest;

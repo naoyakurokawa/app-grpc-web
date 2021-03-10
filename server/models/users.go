@@ -4,15 +4,19 @@ import (
 	// "fmt"
 	"context"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	pb "github.com/naoyakurokawa/app-grpc-web/hello"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	"log"
 )
 
 func GetUsers(ctx context.Context, db *sqlx.DB, request pb.GetUsersRequest) ([]*pb.User, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	log.Printf("メタ : %s", md)
 	var userlist []*pb.User
 	q := "SELECT * FROM users"
 	err := db.SelectContext(ctx, &userlist, q)
@@ -72,7 +76,7 @@ func DeleteUser(ctx context.Context, db *sqlx.DB, id int32) error {
 	return nil
 }
 
-func LoginUser(ctx context.Context, db *sqlx.DB, request pb.LoginRequest) (int32, error) {
+func LoginUser(ctx context.Context, db *sqlx.DB, request pb.LoginRequest) (int32, string, error) {
 	// var token string
 	var user []*pb.User
 	q := `SELECT * FROM users WHERE NAME = ?;`
@@ -83,13 +87,41 @@ func LoginUser(ctx context.Context, db *sqlx.DB, request pb.LoginRequest) (int32
 	err = bcrypt.CompareHashAndPassword([]byte(user[0].Password), []byte(request.GetPassword()))
 
 	if err != nil {
-
-		return -1, status.New(codes.InvalidArgument, "ユーザー名 または　パスワードが間違っています").Err()
+		return -1, "", status.New(codes.InvalidArgument, "ユーザー名 または　パスワードが間違っています").Err()
 	}
 
-	// token, err = user_service.CreateToken(user)
-	// if err != nil {
-	// 	return -1, "", status.New(codes.Unknown, "作成失敗").Err()
-	// }
-	return user[0].Id, nil
+	//セッションDB登録
+	session := &pb.Session{
+		Uuid:   createUUID(),
+		Name:   user[0].Name,
+		Userid: user[0].Id,
+	}
+	_, err = CreateSession(session, db)
+	if err != nil {
+		log.Println(err)
+		return -1, "", err
+	}
+
+	return user[0].Id, session.Uuid, nil
+}
+
+func createUUID() (uuidobj string) {
+	u, _ := uuid.NewUUID()
+	uuidobj = u.String()
+	return uuidobj
+}
+
+func CreateSession(sess *pb.Session, db *sqlx.DB) (string, error) {
+	query := `INSERT INTO session (id, uuid, name, userid) VALUES (:id, :uuid, :name, :userid);`
+	tx := db.MustBegin()
+	_, err := tx.NamedExec(query, &sess)
+	if err != nil {
+		log.Printf("error : %s", err)
+		// エラーが発生した場合はロールバックします。
+		tx.Rollback()
+		// エラー内容を返却します。
+		return "セッション登録失敗", err
+	}
+	tx.Commit()
+	return "セッション登録成功", err
 }

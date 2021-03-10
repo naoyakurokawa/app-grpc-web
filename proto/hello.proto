@@ -25,6 +25,13 @@ message User {
   string password = 5;
 }
 
+message Session {
+  int32 id = 1;
+  string uuid = 2;
+  string name = 3;
+  int32 userid = 4;
+}
+
 message GetUsersRequest {
     int32 id = 1;
     string name = 2;

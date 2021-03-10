@@ -6,19 +6,24 @@ import { UserList } from "../../components/UserList"
 import Link from 'next/link'
 import Router from 'next/router'
 import {GetUsersRequest} from '../../lib/hello_pb';
+import { useCookies } from 'react-cookie';
 
 export default function UsersList() {
   const [dbData, setDbData] = useState({});
+  const [cookies, setCookie] = useCookies(['login_token']);
+  const metadata = {'login_token': cookies}
+  // console.log("めた",metadata);
   //データベースのデータを取得、表示
   const fetchDbData = async ()=>{
       const request = new GetUsersRequest();
       const client = new HelloServiceClient("http://localhost:8080");
-      const response = await client.getUsers(request, {});
+      const response = await client.getUsers(request, metadata);
       const userList = response.toObject();
       setDbData(userList["usersList"]);
   }
   useEffect(()=>{
     fetchDbData();
+    console.log("bbbbbbbbbbbb",cookies);
   },[])
 
   return (

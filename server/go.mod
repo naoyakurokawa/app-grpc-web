@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/golang/protobuf v1.4.3
+	github.com/google/uuid v1.2.0 // indirect
 	github.com/jmoiron/sqlx v1.3.1
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83 // indirect
 	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110 // indirect

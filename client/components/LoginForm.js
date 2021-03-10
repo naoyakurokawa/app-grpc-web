@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import {LoginRequest} from '../lib/hello_pb';
 import {HelloServiceClient} from '../lib/HelloServiceClientPb';
-import Router from 'next/router'
+import Router from 'next/router';
+import { useCookies } from 'react-cookie';
 
 export const LoginForm = () => {
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const [cookies, setCookie] = useCookies(['login_token']);
 
   //フォームsubmit時の処理
   const submitLoginForm = async(event) => {
@@ -16,9 +18,13 @@ export const LoginForm = () => {
     request.setPassword(password);
     const client = new HelloServiceClient("http://localhost:8080");
     const response = await client.login(request, {});
-    console.log("ログイン結果",response.toObject().id);
+    // response.on("metadata", metadata => {
+    //   console.log("onMetadata:" + metadata.get("login_token"))
+    // });
     if(response.toObject().islogin){
-      Router.push('/')
+      setCookie('login_token', response.toObject().token, { path: '/' });
+      console.log("aaaaaa",cookies);
+      Router.push('/users/list')
       return
     }
   }

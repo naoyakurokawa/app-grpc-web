@@ -46,8 +46,8 @@ export default function User() {
   return (
     <div>
       <UserDetail UserData={userData}/>
-      <Link href="/">
-        <a>トップページへ戻る</a>
+      <Link href="/users/list">
+        <a>ユーザー一覧へ戻る</a>
       </Link>
       <br/>
       <button onClick={deleteUser}>削除する</button>
