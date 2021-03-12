@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	pb "github.com/naoyakurokawa/app-grpc-web/hello"
+	"github.com/naoyakurokawa/app-grpc-web/validate"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -79,8 +80,13 @@ func DeleteUser(ctx context.Context, db *sqlx.DB, id int32) error {
 func LoginUser(ctx context.Context, db *sqlx.DB, request pb.LoginRequest) (int32, string, error) {
 	// var token string
 	var user []*pb.User
+	//form validation
+	err := validate.CheckLoginUserRequest(request)
+	if err != nil {
+		return -1, "", status.New(codes.InvalidArgument, "ユーザー名もしくはパスワードは必須です").Err()
+	}
 	q := `SELECT * FROM users WHERE NAME = ?;`
-	err := db.SelectContext(ctx, &user, q, request.GetName())
+	err = db.SelectContext(ctx, &user, q, request.GetName())
 	// err := user_service.CheckLoginUserRequest(request)
 	log.Printf("user : %s", user[0].Id)
 	// db.Where("email = ?", request.Email).First(&user)

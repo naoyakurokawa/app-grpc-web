@@ -18,6 +18,7 @@ export const LoginForm = () => {
     request.setPassword(password);
     const client = new HelloServiceClient("http://localhost:8080");
     const response = await client.login(request, {});
+    console.log("レスポンス",response);
     // response.on("metadata", metadata => {
     //   console.log("onMetadata:" + metadata.get("login_token"))
     // });

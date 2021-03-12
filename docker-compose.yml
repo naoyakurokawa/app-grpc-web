@@ -3,6 +3,7 @@ services:
   db:
     image: mysql:8.0
     volumes:
+      - ./initdb.d:/docker-entrypoint-initdb.d
       - db-store:/var/lib/mysql
       - ./logs:/var/log/mysql
       - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
