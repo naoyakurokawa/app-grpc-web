@@ -10,9 +10,8 @@ import { useCookies } from 'react-cookie';
 
 export default function UsersList() {
   const [dbData, setDbData] = useState({});
-  const [cookies, setCookie] = useCookies(['login_token']);
+  const [cookies, setCookie, removeCookie] = useCookies(['login_token']);
   const metadata = {'login_token': cookies}
-  // console.log("めた",metadata);
   //データベースのデータを取得、表示
   const fetchDbData = async ()=>{
       const request = new GetUsersRequest();
@@ -21,9 +20,19 @@ export default function UsersList() {
       const userList = response.toObject();
       setDbData(userList["usersList"]);
   }
+  const checkIsLogin = ()=>{
+    if(!cookies.login_token){
+      Router.push('/')
+      return
+    }
+  }
+  const logout = () =>{
+    removeCookie('login_token', { path: '/' });
+    Router.push('/')
+  }
   useEffect(()=>{
+    checkIsLogin();
     fetchDbData();
-    console.log("bbbbbbbbbbbb",cookies);
   },[])
 
   return (
@@ -43,6 +52,7 @@ export default function UsersList() {
           <h3>grpc-test-fetch-userTable</h3>
           <UserList userList={dbData}/>
         </div>
+        <button onClick={logout}>ログアウト</button>
       </main>
 
       <footer>

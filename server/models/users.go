@@ -1,13 +1,12 @@
 package models
 
 import (
-	// "fmt"
 	"context"
+	// "fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	pb "github.com/naoyakurokawa/app-grpc-web/hello"
-	"github.com/naoyakurokawa/app-grpc-web/validate"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -78,22 +77,31 @@ func DeleteUser(ctx context.Context, db *sqlx.DB, id int32) error {
 }
 
 func LoginUser(ctx context.Context, db *sqlx.DB, request pb.LoginRequest) (int32, string, error) {
-	// var token string
 	var user []*pb.User
-	//form validation
-	err := validate.CheckLoginUserRequest(request)
+
+	//ユーザー名必須チェック
+	err := CheckRequired("名前", request.GetName())
 	if err != nil {
-		return -1, "", status.New(codes.InvalidArgument, "ユーザー名もしくはパスワードは必須です").Err()
+		return -1, "", err
 	}
+
+	//パスワード必須チェック
+	err = CheckRequired("パスワード", request.GetPassword())
+	if err != nil {
+		return -1, "", err
+	}
+
+	//ユーザー存在チェック
 	q := `SELECT * FROM users WHERE NAME = ?;`
 	err = db.SelectContext(ctx, &user, q, request.GetName())
-	// err := user_service.CheckLoginUserRequest(request)
-	log.Printf("user : %s", user[0].Id)
-	// db.Where("email = ?", request.Email).First(&user)
-	err = bcrypt.CompareHashAndPassword([]byte(user[0].Password), []byte(request.GetPassword()))
-
 	if err != nil {
-		return -1, "", status.New(codes.InvalidArgument, "ユーザー名 または　パスワードが間違っています").Err()
+		return -1, "", status.New(codes.InvalidArgument, "ユーザー名が間違っています").Err()
+	}
+
+	//パスワード一致チェック
+	err = CheckMatchPassword(user[0].Password, request.GetPassword())
+	if err != nil {
+		return -1, "", err
 	}
 
 	//セッションDB登録
@@ -130,4 +138,25 @@ func CreateSession(sess *pb.Session, db *sqlx.DB) (string, error) {
 	}
 	tx.Commit()
 	return "セッション登録成功", err
+}
+
+//Validation関連のメソッド
+
+//必須チェック
+func CheckRequired(feild string, input string) error {
+	if input == "" {
+		return status.New(codes.InvalidArgument, feild+"は必須です").Err()
+	} else {
+		return nil
+	}
+}
+
+//パスワード一致確認
+func CheckMatchPassword(dbData string, input string) error {
+	err := bcrypt.CompareHashAndPassword([]byte(dbData), []byte(input))
+	if err != nil {
+		return status.New(codes.InvalidArgument, "パスワードが間違っています").Err()
+	} else {
+		return nil
+	}
 }

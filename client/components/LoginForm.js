@@ -19,9 +19,6 @@ export const LoginForm = () => {
     const client = new HelloServiceClient("http://localhost:8080");
     const response = await client.login(request, {});
     console.log("レスポンス",response);
-    // response.on("metadata", metadata => {
-    //   console.log("onMetadata:" + metadata.get("login_token"))
-    // });
     if(response.toObject().islogin){
       setCookie('login_token', response.toObject().token, { path: '/' });
       console.log("aaaaaa",cookies);
