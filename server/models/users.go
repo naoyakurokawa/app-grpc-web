@@ -15,13 +15,29 @@ import (
 )
 
 func GetUsers(ctx context.Context, db *sqlx.DB, request pb.GetUsersRequest) ([]*pb.User, error) {
-	md, _ := metadata.FromIncomingContext(ctx)
-	log.Printf("メタ : %s", md)
-	var userlist []*pb.User
-	q := "SELECT * FROM users"
-	err := db.SelectContext(ctx, &userlist, q)
+	//メタデータ取得
+	md, ok := metadata.FromIncomingContext(ctx)
+	if ok == false {
+		return nil, nil
+	}
+	//メターデータの中のlogin_tokenを参照
+	login_token := md["login_token"][0]
+	//sessionテーブルにlogin_tokenに紐づくデータが存在するか確認
+	s, err := GetSessionByUuid(ctx, db, login_token)
+	//sessionテーブルに存在しなければreturn
+	if len(s) == 0 {
+		return nil, nil
+	}
 	if err != nil {
 		log.Println(err)
+		return nil, err
+	}
+	var userlist []*pb.User
+	q := "SELECT * FROM users"
+	err = db.SelectContext(ctx, &userlist, q)
+	if err != nil {
+		log.Println(err)
+		return nil, err
 	}
 	// log.Printf("userList : %s", userlist)
 	return userlist, nil
@@ -41,7 +57,7 @@ func CreateUser(ctx context.Context, db *sqlx.DB, request pb.CreateUserRequest) 
 		Password: hash_password,
 	}
 	query := `INSERT INTO users (id, name, score, photourl, password) VALUES (:id, :name, :score, :photourl, :password);`
-	tx := db.MustBegin()
+	tx, err := db.Beginx()
 	_, err = tx.NamedExecContext(ctx, query, &user)
 	if err != nil {
 		log.Printf("error : %s", err)
@@ -110,7 +126,7 @@ func LoginUser(ctx context.Context, db *sqlx.DB, request pb.LoginRequest) (int32
 		Name:   user[0].Name,
 		Userid: user[0].Id,
 	}
-	_, err = CreateSession(session, db)
+	err = CreateSession(session, db)
 	if err != nil {
 		log.Println(err)
 		return -1, "", err
@@ -125,19 +141,30 @@ func createUUID() (uuidobj string) {
 	return uuidobj
 }
 
-func CreateSession(sess *pb.Session, db *sqlx.DB) (string, error) {
+func CreateSession(sess *pb.Session, db *sqlx.DB) error {
 	query := `INSERT INTO session (id, uuid, name, userid) VALUES (:id, :uuid, :name, :userid);`
-	tx := db.MustBegin()
-	_, err := tx.NamedExec(query, &sess)
+	tx, err := db.Beginx()
+	_, err = tx.NamedExec(query, &sess)
 	if err != nil {
 		log.Printf("error : %s", err)
 		// エラーが発生した場合はロールバックします。
 		tx.Rollback()
 		// エラー内容を返却します。
-		return "セッション登録失敗", err
+		return err
 	}
 	tx.Commit()
-	return "セッション登録成功", err
+	return err
+}
+
+func GetSessionByUuid(ctx context.Context, db *sqlx.DB, uuid string) ([]*pb.Session, error) {
+	var session []*pb.Session
+	q := `SELECT * FROM session WHERE Uuid = ?;`
+	err := db.SelectContext(ctx, &session, q, uuid)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	return session, nil
 }
 
 //Validation関連のメソッド

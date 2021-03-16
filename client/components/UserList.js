@@ -5,7 +5,7 @@ export const UserList = ({userList}) => {
       {
         Object.keys(userList).map((key) => {
           return (
-            <div>
+            <div key={userList[key].id}>
               <a href={`/users/${userList[key].id}`}>{userList[key].id}</a>
               名前：{userList[key].name} スコア：{userList[key].score}
             </div>

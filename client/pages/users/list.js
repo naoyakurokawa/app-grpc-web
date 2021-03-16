@@ -11,14 +11,19 @@ import { useCookies } from 'react-cookie';
 export default function UsersList() {
   const [dbData, setDbData] = useState({});
   const [cookies, setCookie, removeCookie] = useCookies(['login_token']);
-  const metadata = {'login_token': cookies}
+  const metadata = {'login_token': cookies.login_token}
   //データベースのデータを取得、表示
   const fetchDbData = async ()=>{
       const request = new GetUsersRequest();
       const client = new HelloServiceClient("http://localhost:8080");
       const response = await client.getUsers(request, metadata);
       const userList = response.toObject();
-      setDbData(userList["usersList"]);
+      if(userList.usersList.length == 0){
+        Router.push('/')
+        return
+      }else{
+        setDbData(userList["usersList"]);
+      }
   }
   const checkIsLogin = ()=>{
     if(!cookies.login_token){

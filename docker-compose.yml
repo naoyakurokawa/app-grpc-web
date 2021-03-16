@@ -39,5 +39,16 @@ services:
       - ./minio/export:/export
       - ./minio/config:/root/.minio
       - ./minio/policies:/policies
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      until (/usr/bin/mc config host add myminio http://minio:9000 minio minio123) do echo '...waiting...' && sleep 1; done;
+      /usr/bin/mc mb myminio/grpc-web-test;
+      /usr/bin/mc policy download myminio/grpc-web-test;
+      exit 0;
+      "
 volumes:
   db-store:

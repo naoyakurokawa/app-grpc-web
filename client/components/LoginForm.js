@@ -12,7 +12,6 @@ export const LoginForm = () => {
   //フォームsubmit時の処理
   const submitLoginForm = async(event) => {
     event.preventDefault();
-    //画像アップロード
     const request = new LoginRequest();
     request.setName(name);
     request.setPassword(password);
