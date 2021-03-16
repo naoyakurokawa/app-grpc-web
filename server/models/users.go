@@ -3,6 +3,8 @@ package models
 import (
 	"context"
 	// "fmt"
+	"log"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -11,7 +13,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-	"log"
 )
 
 func GetUsers(ctx context.Context, db *sqlx.DB, request pb.GetUsersRequest) ([]*pb.User, error) {
@@ -56,18 +57,24 @@ func CreateUser(ctx context.Context, db *sqlx.DB, request pb.CreateUserRequest) 
 		Photourl: request.GetPhotourl(),
 		Password: hash_password,
 	}
-	query := `INSERT INTO users (id, name, score, photourl, password) VALUES (:id, :name, :score, :photourl, :password);`
+	query := `INSERT INTO users (name, score, photourl, password) VALUES (:name, :score, :photourl, :password);`
 	tx, err := db.Beginx()
 	_, err = tx.NamedExecContext(ctx, query, &user)
 	if err != nil {
 		log.Printf("error : %s", err)
 		// エラーが発生した場合はロールバックします。
-		tx.Rollback()
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return "", rollbackErr
+		}
 		// エラー内容を返却します。
 		return "登録失敗", err
 	}
-	tx.Commit()
-	return "登録成功", err
+	err = tx.Commit()
+	if err != nil {
+		return "", err
+	}
+	return "登録成功", nil
 }
 
 func GetUserById(ctx context.Context, db *sqlx.DB, id int32) ([]*pb.User, error) {
@@ -144,16 +151,29 @@ func createUUID() (uuidobj string) {
 func CreateSession(sess *pb.Session, db *sqlx.DB) error {
 	query := `INSERT INTO session (id, uuid, name, userid) VALUES (:id, :uuid, :name, :userid);`
 	tx, err := db.Beginx()
+	if err != nil {
+		log.Printf("error : %s", err)
+		return err
+	}
 	_, err = tx.NamedExec(query, &sess)
 	if err != nil {
 		log.Printf("error : %s", err)
 		// エラーが発生した場合はロールバックします。
-		tx.Rollback()
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			log.Printf("rollbackError : %s", rollbackErr)
+			return rollbackErr
+		}
 		// エラー内容を返却します。
 		return err
 	}
-	tx.Commit()
-	return err
+	err = tx.Commit()
+	if err != nil {
+		log.Printf("error : %s", err)
+		return err
+	}
+
+	return nil
 }
 
 func GetSessionByUuid(ctx context.Context, db *sqlx.DB, uuid string) ([]*pb.Session, error) {
