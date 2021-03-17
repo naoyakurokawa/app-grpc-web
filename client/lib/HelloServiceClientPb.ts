@@ -235,5 +235,45 @@ export class HelloServiceClient {
     this.methodInfoDeleteUser);
   }
 
+  methodInfoLogin = new grpcWeb.AbstractClientBase.MethodInfo(
+    hello_pb.LoginResponse,
+    (request: hello_pb.LoginRequest) => {
+      return request.serializeBinary();
+    },
+    hello_pb.LoginResponse.deserializeBinary
+  );
+
+  login(
+    request: hello_pb.LoginRequest,
+    metadata: grpcWeb.Metadata | null): Promise<hello_pb.LoginResponse>;
+
+  login(
+    request: hello_pb.LoginRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: hello_pb.LoginResponse) => void): grpcWeb.ClientReadableStream<hello_pb.LoginResponse>;
+
+  login(
+    request: hello_pb.LoginRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.Error,
+               response: hello_pb.LoginResponse) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/HelloService/Login',
+        request,
+        metadata || {},
+        this.methodInfoLogin,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/HelloService/Login',
+    request,
+    metadata || {},
+    this.methodInfoLogin);
+  }
+
 }
 

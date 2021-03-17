@@ -1,28 +1,43 @@
 import Head from 'next/head'
+import { useEffect,useState } from 'react'
+import { useRouter } from 'next/router'
+import {HelloServiceClient} from '../../lib/HelloServiceClientPb';
+import { UserList } from "../../components/UserList"
 import Link from 'next/link'
 import Router from 'next/router'
-import { useEffect,useState } from 'react'
-import { Form } from "../components/Form"
-import { List } from "../components/List"
-import { UserRegisterForm } from "../components/UserRegisterForm"
-import { UserList } from "../components/UserList"
-import { getFormData } from '../components/const/form_data';
-import {HelloServiceClient} from '../lib/HelloServiceClientPb';
+import {GetUsersRequest} from '../../lib/hello_pb';
+import { useCookies } from 'react-cookie';
 
-
-export default function Home() {
-  const [formData, setFormData] = useState([]);
-  //フォームの入力データを取得、表示
-  const fetchFormData = async ()=>{
-    const Data = await getFormData();
-    setFormData(Data);
+export default function UsersList() {
+  const [dbData, setDbData] = useState({});
+  const [cookies, setCookie, removeCookie] = useCookies(['login_token']);
+  const metadata = {'login_token': cookies.login_token}
+  //データベースのデータを取得、表示
+  const fetchDbData = async ()=>{
+      const request = new GetUsersRequest();
+      const client = new HelloServiceClient("http://localhost:8080");
+      const response = await client.getUsers(request, metadata);
+      const userList = response.toObject();
+      if(userList.usersList.length == 0){
+        Router.push('/')
+        return
+      }else{
+        setDbData(userList["usersList"]);
+      }
   }
-  const addData = (data) => {
-    // ...はスプレット構文 :「[ ] や { }を外してくれるやつ」
-    setFormData([...formData, data]);
+  const checkIsLogin = ()=>{
+    if(!cookies.login_token){
+      Router.push('/')
+      return
+    }
+  }
+  const logout = () =>{
+    removeCookie('login_token', { path: '/' });
+    Router.push('/')
   }
   useEffect(()=>{
-    fetchFormData();
+    checkIsLogin();
+    fetchDbData();
   },[])
 
   return (
@@ -34,31 +49,15 @@ export default function Home() {
 
       <main>
         <h1 className="title">
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
+          User List
         </h1>
 
         {/* <Form onAddLang={addLang}/> */}
-        <div className="fetch-form-sec">
-          <Form onAddData={addData}/>
-          <List formData={formData}/>
+        <div className="fetch-db-sec">
+          <h3>grpc-test-fetch-userTable</h3>
+          <UserList userList={dbData}/>
         </div>
-        <div className="register-user-sec">
-          <Link href="/login">
-            <a>ログインはこちら</a>
-          </Link>
-          <UserRegisterForm/>
-        </div>
-        <div className="grid">
-          <a href="" className="card">
-            <h3>test1</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="" className="card">
-            <h3>test2</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-        </div>
+        <button onClick={logout}>ログアウト</button>
       </main>
 
       <footer>

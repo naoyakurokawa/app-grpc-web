@@ -51,6 +51,9 @@ export class User extends jspb.Message {
   getPhotourl(): string;
   setPhotourl(value: string): User;
 
+  getPassword(): string;
+  setPassword(value: string): User;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): User.AsObject;
   static toObject(includeInstance: boolean, msg: User): User.AsObject;
@@ -65,6 +68,37 @@ export namespace User {
     name: string,
     score: number,
     photourl: string,
+    password: string,
+  }
+}
+
+export class Session extends jspb.Message {
+  getId(): number;
+  setId(value: number): Session;
+
+  getUuid(): string;
+  setUuid(value: string): Session;
+
+  getName(): string;
+  setName(value: string): Session;
+
+  getUserid(): number;
+  setUserid(value: number): Session;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): Session.AsObject;
+  static toObject(includeInstance: boolean, msg: Session): Session.AsObject;
+  static serializeBinaryToWriter(message: Session, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Session;
+  static deserializeBinaryFromReader(message: Session, reader: jspb.BinaryReader): Session;
+}
+
+export namespace Session {
+  export type AsObject = {
+    id: number,
+    uuid: string,
+    name: string,
+    userid: number,
   }
 }
 
@@ -81,6 +115,9 @@ export class GetUsersRequest extends jspb.Message {
   getPhotourl(): string;
   setPhotourl(value: string): GetUsersRequest;
 
+  getPassword(): string;
+  setPassword(value: string): GetUsersRequest;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): GetUsersRequest.AsObject;
   static toObject(includeInstance: boolean, msg: GetUsersRequest): GetUsersRequest.AsObject;
@@ -95,6 +132,7 @@ export namespace GetUsersRequest {
     name: string,
     score: number,
     photourl: string,
+    password: string,
   }
 }
 
@@ -131,6 +169,9 @@ export class CreateUserRequest extends jspb.Message {
   getPhotourl(): string;
   setPhotourl(value: string): CreateUserRequest;
 
+  getPassword(): string;
+  setPassword(value: string): CreateUserRequest;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): CreateUserRequest.AsObject;
   static toObject(includeInstance: boolean, msg: CreateUserRequest): CreateUserRequest.AsObject;
@@ -145,6 +186,7 @@ export namespace CreateUserRequest {
     name: string,
     score: number,
     photourl: string,
+    password: string,
   }
 }
 
@@ -237,6 +279,54 @@ export class DeleteUserResponse extends jspb.Message {
 export namespace DeleteUserResponse {
   export type AsObject = {
     isdelete: boolean,
+  }
+}
+
+export class LoginRequest extends jspb.Message {
+  getName(): string;
+  setName(value: string): LoginRequest;
+
+  getPassword(): string;
+  setPassword(value: string): LoginRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): LoginRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: LoginRequest): LoginRequest.AsObject;
+  static serializeBinaryToWriter(message: LoginRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): LoginRequest;
+  static deserializeBinaryFromReader(message: LoginRequest, reader: jspb.BinaryReader): LoginRequest;
+}
+
+export namespace LoginRequest {
+  export type AsObject = {
+    name: string,
+    password: string,
+  }
+}
+
+export class LoginResponse extends jspb.Message {
+  getId(): number;
+  setId(value: number): LoginResponse;
+
+  getToken(): string;
+  setToken(value: string): LoginResponse;
+
+  getIslogin(): boolean;
+  setIslogin(value: boolean): LoginResponse;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): LoginResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: LoginResponse): LoginResponse.AsObject;
+  static serializeBinaryToWriter(message: LoginResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): LoginResponse;
+  static deserializeBinaryFromReader(message: LoginResponse, reader: jspb.BinaryReader): LoginResponse;
+}
+
+export namespace LoginResponse {
+  export type AsObject = {
+    id: number,
+    token: string,
+    islogin: boolean,
   }
 }
 

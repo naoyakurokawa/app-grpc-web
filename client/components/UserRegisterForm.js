@@ -8,6 +8,7 @@ import AWS from 'aws-sdk';
 export const UserRegisterForm = () => {
   const [name, setName] = useState('');
   const [score, setScore] = useState('');
+  const [password, setPassword] = useState('');
   const [profileImage, setProfileImage] = useState('');
   const [imageFile, setImage] = useState('');
   const [imageUploadUrl, setImageUploadUrl] = useState('');
@@ -54,6 +55,7 @@ export const UserRegisterForm = () => {
     uploadImg(imageFile);
     const request = new CreateUserRequest();
     request.setName(name);
+    request.setPassword(password);
     request.setScore(score);
     //DBには画像のURLを保存
     request.setPhotourl(imageUploadUrl);
@@ -62,13 +64,20 @@ export const UserRegisterForm = () => {
   }
   return (
     <div className="user-form-container">
-      <h4>user-register-form</h4>
+      <h4>会員登録は以下のフォームからご登録下さい</h4>
       <form onSubmit={submitUserRegisterForm}>
         <div>
-          <p>名前</p>
+          <p>ユーザー名</p>
           <input
             type ="text"
             onChange={(e)=>setName(e.target.value)}
+          />
+        </div>
+        <div>
+          <p>パスワード</p>
+          <input
+            type ="password"
+            onChange={(e)=>setPassword(e.target.value)}
           />
         </div>
         <div>
