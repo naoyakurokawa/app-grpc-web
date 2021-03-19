@@ -1,8 +1,6 @@
 package models
 
 import (
-	// "fmt"
-
 	"context"
 	"log"
 	"testing"
@@ -22,13 +20,15 @@ const (
 
 // ユーザ取得 正常
 func TestGetUsersSuccess(t *testing.T) {
-	var db *sqlx.DB
+	db, err := sqlx.Open("mysql", "root:test@tcp(127.0.0.1:13306)/test")
+	if err != nil {
+		log.Fatalln(err)
+	}
 	ctx := context.Background()
 	InitUserTable(db)
 	CreateUserForTest(db)
 	request := pb.GetUsersRequest{}
 	users, err := GetUsers(ctx, db, request)
-
 	if err != nil {
 		t.Error("\n実際： ", "エラー", "\n理想： ", "正常終了")
 	}
@@ -53,9 +53,14 @@ func InitUserTable(db *sqlx.DB) error {
 	return nil
 }
 
+//今後 user_idをもとにしたユーザー取得のテストにも用いるため、idをreturnする
 func CreateUserForTest(db *sqlx.DB) (int32, error) {
 	//パスワードのハッシュ化
-	hash, _ := bcrypt.GenerateFromPassword([]byte(Password), 10)
+	hash, err := bcrypt.GenerateFromPassword([]byte(Password), 10)
+	if err != nil {
+		log.Printf("error : %s", err)
+		return -1, err
+	}
 	hash_password := string(hash)
 	user := pb.User{
 		Name:     Name,
@@ -65,6 +70,10 @@ func CreateUserForTest(db *sqlx.DB) (int32, error) {
 	}
 	query := `INSERT INTO users (name, score, photourl, password) VALUES (:name, :score, :photourl, :password);`
 	tx, err := db.Beginx()
+	if err != nil {
+		log.Printf("error : %s", err)
+		return -1, err
+	}
 	_, err = tx.NamedExec(query, &user)
 	if err != nil {
 		log.Printf("error : %s", err)
@@ -80,6 +89,5 @@ func CreateUserForTest(db *sqlx.DB) (int32, error) {
 	if err != nil {
 		return -1, err
 	}
-
 	return user.Id, nil
 }
