@@ -25,12 +25,12 @@ func GetUsers(ctx context.Context, db *sqlx.DB, request pb.GetUsersRequest) ([]*
 	//sessionテーブルにlogin_tokenに紐づくデータが存在するか確認
 	// s, err := GetSessionByUuid(ctx, db, login_token)
 	//sessionテーブルに存在しなければreturn
-	// if len(s) == 0 {
-	// 	return nil, nil
-	// }
 	// if err != nil {
 	// 	log.Println(err)
 	// 	return nil, err
+	// }
+	// if len(s) == 0 {
+	// 	return nil, nil
 	// }
 	var userlist []*pb.User
 	q := "SELECT * FROM users"
