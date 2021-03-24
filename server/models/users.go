@@ -11,31 +11,30 @@ import (
 	pb "github.com/naoyakurokawa/app-grpc-web/hello"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
 func GetUsers(ctx context.Context, db *sqlx.DB, request pb.GetUsersRequest) ([]*pb.User, error) {
 	//メタデータ取得
-	md, ok := metadata.FromIncomingContext(ctx)
-	if ok == false {
-		return nil, nil
-	}
+	// md, ok := metadata.FromIncomingContext(ctx)
+	// if ok == false {
+	// 	return nil, nil
+	// }
 	//メターデータの中のlogin_tokenを参照
-	login_token := md["login_token"][0]
+	// login_token := md["login_token"][0]
 	//sessionテーブルにlogin_tokenに紐づくデータが存在するか確認
-	s, err := GetSessionByUuid(ctx, db, login_token)
+	// s, err := GetSessionByUuid(ctx, db, login_token)
 	//sessionテーブルに存在しなければreturn
-	if len(s) == 0 {
-		return nil, nil
-	}
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
+	// if err != nil {
+	// 	log.Println(err)
+	// 	return nil, err
+	// }
+	// if len(s) == 0 {
+	// 	return nil, nil
+	// }
 	var userlist []*pb.User
 	q := "SELECT * FROM users"
-	err = db.SelectContext(ctx, &userlist, q)
+	err := db.SelectContext(ctx, &userlist, q)
 	if err != nil {
 		log.Println(err)
 		return nil, err
