@@ -20,11 +20,13 @@ func GetUsers(ctx context.Context, db *sqlx.DB, request pb.GetUsersRequest) ([]*
 	// if ok == false {
 	// 	return nil, nil
 	// }
+	// log.Printf("meta : %s", md)
 	//メターデータの中のlogin_tokenを参照
 	// login_token := md["login_token"][0]
-	//sessionテーブルにlogin_tokenに紐づくデータが存在するか確認
+	// log.Println(login_token)
+	// sessionテーブルにlogin_tokenに紐づくデータが存在するか確認
 	// s, err := GetSessionByUuid(ctx, db, login_token)
-	//sessionテーブルに存在しなければreturn
+	// sessionテーブルに存在しなければreturn
 	// if err != nil {
 	// 	log.Println(err)
 	// 	return nil, err
