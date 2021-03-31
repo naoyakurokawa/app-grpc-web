@@ -9,7 +9,9 @@ import (
 	"github.com/jmoiron/sqlx"
 	pb "github.com/naoyakurokawa/app-grpc-web/hello"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/grpc/metadata"
 )
 
 const (
@@ -21,45 +23,23 @@ const (
 
 // ユーザ一覧取得テスト
 func TestGetUsers(t *testing.T) {
-	//DB接続
 	db, err := connectDb()
 	if err != nil {
-		t.Errorf("failed to open mysql connection: %v", err)
+		require.NoError(t, err)
 	}
-	//テーブル初期化
-	err = initUserTable(db)
+	ctx, err := prepare(db)
 	if err != nil {
-		t.Errorf("failed to initUserTable: %v", err)
-	}
-	//テストユーザー作成
-	_, err = createUserForTest(db)
-	if err != nil {
-		t.Errorf("failed to initUserTable: %v", err)
-	}
-	//セッション登録
-	session := &pb.Session{
-		Uuid:   "test123",
-		Name:   Name,
-		Userid: 1,
-	}
-	err = CreateSession(session, db)
-	if err != nil {
-		t.Errorf("failed to CreateSession: %v", err)
+		require.NoError(t, err)
 	}
 
-	//メタデータ設定
-	ctx := context.Background()
-	// m := map[string]string{"login_token": "test123"}
-	// md := metadata.New(m)
-	// ctx := metadata.NewIncomingContext(context.Background(), md)
 	request := pb.GetUsersRequest{}
 	users, err := GetUsers(ctx, db, request)
 	if err != nil {
-		t.Errorf("failed to GetUsers: %v", err)
+		require.NoError(t, err)
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(users[0].Password), []byte("abcd12341231"))
 	if err != nil {
-		t.Errorf("failed to Password: %v", err)
+		require.NoError(t, err)
 	}
 	assert.Equal(t, users[0].Name, "テスト")
 	assert.Equal(t, users[0].Score, int32(1234))
@@ -70,26 +50,39 @@ func TestGetUsers(t *testing.T) {
 func TestCreateUser(t *testing.T) {
 	db, err := connectDb()
 	if err != nil {
-		t.Errorf("failed to open mysql connection: %v", err)
+		require.NoError(t, err)
 	}
-	ctx := context.Background()
+	m := map[string]string{"login_token": "test123"}
+	md := metadata.New(m)
+	ctx := metadata.NewIncomingContext(context.Background(), md)
 	err = initUserTable(db)
 	if err != nil {
-		t.Errorf("failed to initUserTable: %v", err)
+		require.NoError(t, err)
 	}
+	//ユーザー作成
 	request := pb.CreateUserRequest{Name: Name, Score: Score, Photourl: Photourl, Password: Password}
-	_, err = CreateUser(ctx, db, request)
+	userId, err := CreateUser(ctx, db, request)
 	if err != nil {
-		t.Errorf("failed to CreateUser: %v", err)
+		require.NoError(t, err)
+	}
+	//セッション登録
+	session := &pb.Session{
+		Uuid:   "test123",
+		Name:   Name,
+		Userid: userId,
+	}
+	err = CreateSession(session, db)
+	if err != nil {
+		require.NoError(t, err)
 	}
 	getUsersRequest := pb.GetUsersRequest{}
 	users, err := GetUsers(ctx, db, getUsersRequest)
 	if err != nil {
-		t.Errorf("failed to GetUsers: %v", err)
+		require.NoError(t, err)
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(users[0].Password), []byte("abcd12341231"))
 	if err != nil {
-		t.Errorf("failed to Password: %v", err)
+		require.NoError(t, err)
 	}
 	assert.Equal(t, users[0].Name, "テスト")
 	assert.Equal(t, users[0].Score, int32(1234))
@@ -100,26 +93,24 @@ func TestCreateUser(t *testing.T) {
 func TestGetUserById(t *testing.T) {
 	db, err := connectDb()
 	if err != nil {
-		t.Errorf("failed to open mysql connection: %v", err)
+		require.NoError(t, err)
 	}
-	ctx := context.Background()
-	err = initUserTable(db)
+	ctx, err := prepare(db)
 	if err != nil {
-		t.Errorf("failed to initUserTable: %v", err)
-	}
-	_, err = createUserForTest(db)
-	if err != nil {
-		t.Errorf("failed to initUserTable: %v", err)
+		require.NoError(t, err)
 	}
 	getUsersRequest := pb.GetUsersRequest{}
 	users, err := GetUsers(ctx, db, getUsersRequest)
 	if err != nil {
-		t.Errorf("failed to GetUsers: %v", err)
+		require.NoError(t, err)
 	}
 	fetchedUser, err := GetUserById(ctx, db, users[0].Id)
+	if err != nil {
+		require.NoError(t, err)
+	}
 	err = bcrypt.CompareHashAndPassword([]byte(fetchedUser[0].Password), []byte("abcd12341231"))
 	if err != nil {
-		t.Errorf("failed to Password: %v", err)
+		require.NoError(t, err)
 	}
 	assert.Equal(t, fetchedUser[0].Name, "テスト")
 	assert.Equal(t, fetchedUser[0].Score, int32(1234))
@@ -130,51 +121,45 @@ func TestGetUserById(t *testing.T) {
 func TestDeleteUser(t *testing.T) {
 	db, err := connectDb()
 	if err != nil {
-		t.Errorf("failed to open mysql connection: %v", err)
+		require.NoError(t, err)
 	}
-	ctx := context.Background()
-	err = initUserTable(db)
+	ctx, err := prepare(db)
 	if err != nil {
-		t.Errorf("failed to initUserTable: %v", err)
-	}
-	_, err = createUserForTest(db)
-	if err != nil {
-		t.Errorf("failed to initUserTable: %v", err)
+		require.NoError(t, err)
 	}
 	getUsersRequest := pb.GetUsersRequest{}
 	users, err := GetUsers(ctx, db, getUsersRequest)
 	if err != nil {
-		t.Errorf("failed to GetUsers: %v", err)
+		require.NoError(t, err)
 	}
 	DeleteUser(ctx, db, users[0].Id)
 	fetchedUser, err := GetUserById(ctx, db, users[0].Id)
+	if err != nil {
+		require.NoError(t, err)
+	}
 	assert.Equal(t, len(fetchedUser), int(0))
 }
 
-//ログインテスト
+// //ログインテスト
 func TestLoginUser(t *testing.T) {
 	db, err := connectDb()
 	if err != nil {
-		t.Errorf("failed to open mysql connection: %v", err)
+		require.NoError(t, err)
 	}
-	ctx := context.Background()
-	err = initUserTable(db)
+	ctx, err := prepare(db)
 	if err != nil {
-		t.Errorf("failed to initUserTable: %v", err)
-	}
-	//テストユーザー作成
-	_, err = createUserForTest(db)
-	if err != nil {
-		t.Errorf("failed to initUserTable: %v", err)
+		require.NoError(t, err)
 	}
 	//作成したユーザー取得
 	getUsersRequest := pb.GetUsersRequest{}
 	users, err := GetUsers(ctx, db, getUsersRequest)
 	if err != nil {
-		t.Errorf("failed to GetUsers: %v", err)
+		require.NoError(t, err)
 	}
 	fetchedUser, err := GetUserById(ctx, db, users[0].Id)
-
+	if err != nil {
+		require.NoError(t, err)
+	}
 	//セッションDB登録
 	session := &pb.Session{
 		Uuid:   createUUID(),
@@ -183,18 +168,52 @@ func TestLoginUser(t *testing.T) {
 	}
 	err = CreateSession(session, db)
 	if err != nil {
-		t.Errorf("failed to CreateSession: %v", err)
+		require.NoError(t, err)
 	}
 
 	//ログイン処理テスト
 	loginRequest := pb.LoginRequest{Name: Name, Password: Password}
 	_, _, err = LoginUser(ctx, db, loginRequest)
 	if err != nil {
-		t.Errorf("failed to Login: %v", err)
+		require.NoError(t, err)
 	}
 }
 
 //テスト用データ作成用プライベートメソッド
+func prepare(db *sqlx.DB) (context.Context, error) {
+	//テーブル初期化
+	err := initUserTable(db)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	//テストユーザー作成
+	userId, err := createUserForTest(db)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	//セッション登録
+	session := &pb.Session{
+		Uuid:   "test123",
+		Name:   Name,
+		Userid: userId,
+	}
+	err = CreateSession(session, db)
+	if err != nil {
+		return nil, err
+	}
+
+	//メタデータ設定
+	ctx := context.Background()
+	m := map[string]string{"login_token": "test123"}
+	md := metadata.New(m)
+	ctx = metadata.NewIncomingContext(context.Background(), md)
+
+	return ctx, nil
+}
+
 func connectDb() (*sqlx.DB, error) {
 	db, err := sqlx.Open("mysql", "root:test@tcp(127.0.0.1:13306)/test")
 	if err != nil {
@@ -210,19 +229,7 @@ func initUserTable(db *sqlx.DB) error {
 		log.Println(err)
 		return err
 	}
-	q = `ALTER TABLE users auto_increment = 1;`
-	_, err = db.Exec(q)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
 	q = `DELETE FROM session;`
-	_, err = db.Exec(q)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	q = `ALTER TABLE session auto_increment = 1;`
 	_, err = db.Exec(q)
 	if err != nil {
 		log.Println(err)
@@ -230,6 +237,19 @@ func initUserTable(db *sqlx.DB) error {
 	}
 	return nil
 }
+
+//テスト共通処理
+// func TestMain(m *testing.M) {
+// 	prepare()
+// 	// 開始処理
+// 	log.Print("setup")
+// 	// パッケージ内のテストの実行
+// 	code := m.Run()
+// 	// 終了処理
+// 	log.Print("tear-down")
+// 	// テストの終了コードで exit
+// 	os.Exit(code)
+// }
 
 //今後 user_idをもとにしたユーザー取得のテストにも用いるため、idをreturnする
 func createUserForTest(db *sqlx.DB) (int32, error) {
