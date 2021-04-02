@@ -24,23 +24,15 @@ const (
 // ユーザ一覧取得テスト
 func TestGetUsers(t *testing.T) {
 	db, err := connectDb()
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	ctx, err := prepare(db)
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 
 	request := pb.GetUsersRequest{}
 	users, err := GetUsers(ctx, db, request)
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	err = bcrypt.CompareHashAndPassword([]byte(users[0].Password), []byte("abcd12341231"))
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	assert.Equal(t, users[0].Name, "テスト")
 	assert.Equal(t, users[0].Score, int32(1234))
 	assert.Equal(t, users[0].Photourl, "https://test")
@@ -49,22 +41,16 @@ func TestGetUsers(t *testing.T) {
 //ユーザー登録テスト
 func TestCreateUser(t *testing.T) {
 	db, err := connectDb()
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	m := map[string]string{"login_token": "test123"}
 	md := metadata.New(m)
 	ctx := metadata.NewIncomingContext(context.Background(), md)
 	err = initUserTable(db)
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	//ユーザー作成
 	request := pb.CreateUserRequest{Name: Name, Score: Score, Photourl: Photourl, Password: Password}
 	userId, err := CreateUser(ctx, db, request)
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	//セッション登録
 	session := &pb.Session{
 		Uuid:   "test123",
@@ -72,18 +58,12 @@ func TestCreateUser(t *testing.T) {
 		Userid: userId,
 	}
 	err = CreateSession(session, db)
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	getUsersRequest := pb.GetUsersRequest{}
 	users, err := GetUsers(ctx, db, getUsersRequest)
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	err = bcrypt.CompareHashAndPassword([]byte(users[0].Password), []byte("abcd12341231"))
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	assert.Equal(t, users[0].Name, "テスト")
 	assert.Equal(t, users[0].Score, int32(1234))
 	assert.Equal(t, users[0].Photourl, "https://test")
@@ -92,26 +72,16 @@ func TestCreateUser(t *testing.T) {
 //ユーザー取得テスト
 func TestGetUserById(t *testing.T) {
 	db, err := connectDb()
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	ctx, err := prepare(db)
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	getUsersRequest := pb.GetUsersRequest{}
 	users, err := GetUsers(ctx, db, getUsersRequest)
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	fetchedUser, err := GetUserById(ctx, db, users[0].Id)
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	err = bcrypt.CompareHashAndPassword([]byte(fetchedUser[0].Password), []byte("abcd12341231"))
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	assert.Equal(t, fetchedUser[0].Name, "テスト")
 	assert.Equal(t, fetchedUser[0].Score, int32(1234))
 	assert.Equal(t, fetchedUser[0].Photourl, "https://test")
@@ -120,46 +90,30 @@ func TestGetUserById(t *testing.T) {
 //ユーザー削除テスト
 func TestDeleteUser(t *testing.T) {
 	db, err := connectDb()
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	ctx, err := prepare(db)
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	getUsersRequest := pb.GetUsersRequest{}
 	users, err := GetUsers(ctx, db, getUsersRequest)
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	DeleteUser(ctx, db, users[0].Id)
 	fetchedUser, err := GetUserById(ctx, db, users[0].Id)
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	assert.Equal(t, len(fetchedUser), int(0))
 }
 
 // //ログインテスト
 func TestLoginUser(t *testing.T) {
 	db, err := connectDb()
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	ctx, err := prepare(db)
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	//作成したユーザー取得
 	getUsersRequest := pb.GetUsersRequest{}
 	users, err := GetUsers(ctx, db, getUsersRequest)
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	fetchedUser, err := GetUserById(ctx, db, users[0].Id)
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 	//セッションDB登録
 	session := &pb.Session{
 		Uuid:   createUUID(),
@@ -167,16 +121,12 @@ func TestLoginUser(t *testing.T) {
 		Userid: fetchedUser[0].Id,
 	}
 	err = CreateSession(session, db)
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 
 	//ログイン処理テスト
 	loginRequest := pb.LoginRequest{Name: Name, Password: Password}
 	_, _, err = LoginUser(ctx, db, loginRequest)
-	if err != nil {
-		require.NoError(t, err)
-	}
+	require.NoError(t, err)
 }
 
 //テスト用データ作成用プライベートメソッド
