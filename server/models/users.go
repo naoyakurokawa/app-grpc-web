@@ -11,30 +11,33 @@ import (
 	pb "github.com/naoyakurokawa/app-grpc-web/hello"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
 func GetUsers(ctx context.Context, db *sqlx.DB, request pb.GetUsersRequest) ([]*pb.User, error) {
 	//メタデータ取得
-	// md, ok := metadata.FromIncomingContext(ctx)
-	// if ok == false {
-	// 	return nil, nil
-	// }
+	md, ok := metadata.FromIncomingContext(ctx)
+	if ok == false {
+		return nil, nil
+	}
+	log.Printf("meta : %s", md["login_token"][0])
 	//メターデータの中のlogin_tokenを参照
-	// login_token := md["login_token"][0]
-	//sessionテーブルにlogin_tokenに紐づくデータが存在するか確認
-	// s, err := GetSessionByUuid(ctx, db, login_token)
-	//sessionテーブルに存在しなければreturn
-	// if err != nil {
-	// 	log.Println(err)
-	// 	return nil, err
-	// }
-	// if len(s) == 0 {
-	// 	return nil, nil
-	// }
+	login_token := md["login_token"][0]
+	log.Println(login_token)
+	// sessionテーブルにlogin_tokenに紐づくデータが存在するか確認
+	s, err := GetSessionByUuid(ctx, db, login_token)
+	// sessionテーブルに存在しなければreturn
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	if len(s) == 0 {
+		return nil, nil
+	}
 	var userlist []*pb.User
 	q := "SELECT * FROM users"
-	err := db.SelectContext(ctx, &userlist, q)
+	err = db.SelectContext(ctx, &userlist, q)
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -43,11 +46,11 @@ func GetUsers(ctx context.Context, db *sqlx.DB, request pb.GetUsersRequest) ([]*
 	return userlist, nil
 }
 
-func CreateUser(ctx context.Context, db *sqlx.DB, request pb.CreateUserRequest) (string, error) {
+func CreateUser(ctx context.Context, db *sqlx.DB, request pb.CreateUserRequest) (int32, error) {
 	//パスワードのハッシュ化
 	hash, err := bcrypt.GenerateFromPassword([]byte(request.GetPassword()), 10)
 	if err != nil {
-		return "", err
+		return -1, err
 	}
 	hash_password := string(hash)
 	user := pb.User{
@@ -64,16 +67,16 @@ func CreateUser(ctx context.Context, db *sqlx.DB, request pb.CreateUserRequest) 
 		// エラーが発生した場合はロールバックします。
 		rollbackErr := tx.Rollback()
 		if rollbackErr != nil {
-			return "", rollbackErr
+			return -1, rollbackErr
 		}
 		// エラー内容を返却します。
-		return "登録失敗", err
+		return -1, err
 	}
 	err = tx.Commit()
 	if err != nil {
-		return "", err
+		return -1, err
 	}
-	return "登録成功", nil
+	return user.Id, nil
 }
 
 func GetUserById(ctx context.Context, db *sqlx.DB, id int32) ([]*pb.User, error) {
